@@ -1,4 +1,4 @@
-﻿package lt.viko.eif.kladijev.steamapi.stepdefs;
+package lt.viko.eif.kladijev.steamapi.stepdefs;
 
 import io.cucumber.java.en.*;
 import io.restassured.response.Response;
@@ -7,7 +7,7 @@ import static io.restassured.RestAssured.*;
 
 public class GameStepdefs
 {
-    private final String baseUrl = "http://localhost:8080";
+    private final String baseUrl = "http://localhost:8080/api";
     private Response response;
     private String currentUser;
 

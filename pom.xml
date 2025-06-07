@@ -8,7 +8,7 @@
 		<version>3.2.5</version>
 		<relativePath/>
 	</parent>
-	<groupId>lt.viko.eif.kladijev.</groupId>
+	<groupId>lt.viko.eif.kladijev</groupId>
 	<artifactId>steamapi</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>steamapi</name>
@@ -97,15 +97,36 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>**/*.feature</include>
+				</includes>
+			</testResource>
+		</testResources>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.3.1</version>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+
 	</build>
 
 </project>

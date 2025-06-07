@@ -72,6 +72,24 @@ public class Player extends BaseEntity
         this.items = items;
     }
 
+    public Player(String nickName, String email, Integer level, Integer experience, List<Game> games, List<Achievement> achievements, List<Item> items)
+    {
+        this.nickName = nickName;
+        this.email = email;
+        this.level = level;
+        this.experience = experience;
+        this.games = games;
+        this.achievements = achievements;
+    }
+
+    public Player(String nickName, String email, Integer level, Integer experience)
+    {
+        this.nickName = nickName;
+        this.email = email;
+        this.level = level;
+        this.experience = experience;
+    }
+
     public Player() {}
 
     public String getNickName() {

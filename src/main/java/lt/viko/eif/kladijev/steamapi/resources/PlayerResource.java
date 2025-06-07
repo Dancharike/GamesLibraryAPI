@@ -7,6 +7,10 @@ import lt.viko.eif.kladijev.steamapi.mappers.PlayerMapper;
 import lt.viko.eif.kladijev.steamapi.utility.NotFoundException;
 import org.springframework.hateoas.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,10 +26,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class PlayerResource
 {
     private final PlayerRepository playerRepository;
+    private final UserRepository userRepository;
 
-    public PlayerResource(PlayerRepository playerRepository)
+    public PlayerResource(PlayerRepository playerRepository, UserRepository userRepository)
     {
         this.playerRepository = playerRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -84,6 +90,36 @@ public class PlayerResource
                 .map(Player::getGames)
                 .orElseThrow(() -> new RuntimeException("Player not found"));
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/name/{name}/games")
+    public List<Game> getGamesByPlayerId(@PathVariable String name)
+    {
+        Player player = playerRepository.findAll().stream()
+                .filter(p -> p.getNickName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Player", 0L));
+
+        return player.getGames();
+    }
+
+    @PreAuthorize("hasRole('PLAYER')")
+    @GetMapping("/me/games")
+    public List<Game> getMyGames(@AuthenticationPrincipal UserDetails userDetails)
+    {
+        String username = userDetails.getUsername();
+
+        AppUser user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Player player = user.getPlayer();
+        if(player == null)
+        {
+            throw new NotFoundException("No Player entity attached to user " + username, 0L);
+        }
+
+        return player.getGames();
+    }
+
 
     /**
      * Метод для получения списка достижений игрока со специфическим ID.

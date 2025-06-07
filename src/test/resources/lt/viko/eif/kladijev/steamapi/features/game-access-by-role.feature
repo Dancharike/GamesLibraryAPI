@@ -1,4 +1,4 @@
-﻿Feature: Access Games by Role
+Feature: Access Games by Role
 
   Background:
     Given the API is running
