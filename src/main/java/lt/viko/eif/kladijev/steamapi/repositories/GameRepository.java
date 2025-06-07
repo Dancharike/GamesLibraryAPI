@@ -1,4 +1,4 @@
-﻿package lt.viko.eif.kladijev.steamapi.repositories;
+package lt.viko.eif.kladijev.steamapi.repositories;
 
 import lt.viko.eif.kladijev.steamapi.models.Game;
 import org.springframework.data.jpa.repository.JpaRepository;

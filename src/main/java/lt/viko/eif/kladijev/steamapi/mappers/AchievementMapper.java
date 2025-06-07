@@ -1,4 +1,4 @@
-﻿package lt.viko.eif.kladijev.steamapi.mappers;
+package lt.viko.eif.kladijev.steamapi.mappers;
 
 import lt.viko.eif.kladijev.steamapi.dto.AchievementDto;
 import lt.viko.eif.kladijev.steamapi.models.Achievement;

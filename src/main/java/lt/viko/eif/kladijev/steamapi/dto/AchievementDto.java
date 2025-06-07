@@ -1,4 +1,4 @@
-﻿package lt.viko.eif.kladijev.steamapi.dto;
+package lt.viko.eif.kladijev.steamapi.dto;
 
 import java.time.LocalDate;
 

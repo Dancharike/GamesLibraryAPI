@@ -1,4 +1,4 @@
-﻿package lt.viko.eif.kladijev.steamapi.models;
+package lt.viko.eif.kladijev.steamapi.models;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

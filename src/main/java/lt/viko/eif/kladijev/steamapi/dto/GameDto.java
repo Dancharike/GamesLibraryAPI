@@ -1,4 +1,4 @@
-﻿package lt.viko.eif.kladijev.steamapi.dto;
+package lt.viko.eif.kladijev.steamapi.dto;
 
 /**
  * DTO класс, что поможет с грамотным выводом данных Game в API.
