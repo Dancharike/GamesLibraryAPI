@@ -29,7 +29,7 @@ public class GameStepdefs
     {
         response = given()
                 .auth().preemptive().basic(currentUser, "password")
-                .get(baseUrl + "/players/" + id + "/games");
+                .get(baseUrl + "/admins/players/" + id + "/games");
     }
 
     @When("I request games of player with name {string}")
@@ -37,7 +37,7 @@ public class GameStepdefs
     {
         response = given()
                 .auth().preemptive().basic(currentUser, "password")
-                .get(baseUrl + "/players/name/" + name + "/games");
+                .get(baseUrl + "/admins/players/name/" + name + "/games");
     }
 
     @When("I request my own games")

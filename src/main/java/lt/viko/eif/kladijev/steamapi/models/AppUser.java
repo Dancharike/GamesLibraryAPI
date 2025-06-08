@@ -14,6 +14,10 @@ public class AppUser extends BaseEntity
     private String role;
 
     @OneToOne
+    @JoinColumn(name = "admin_id")
+    private Admin admin;
+
+    @OneToOne
     @JoinColumn(name = "player_id")
     private Player player;
 
@@ -58,12 +62,21 @@ public class AppUser extends BaseEntity
         this.player = player;
     }
 
+    public Admin getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
+    }
+
     @Override
     public String toString() {
         return "AppUser{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
+                ", admin=" + admin +
                 ", player=" + player +
                 ", id=" + id +
                 '}';

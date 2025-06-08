@@ -1,7 +1,9 @@
 package lt.viko.eif.kladijev.steamapi.config;
 
+import lt.viko.eif.kladijev.steamapi.models.Admin;
 import lt.viko.eif.kladijev.steamapi.models.AppUser;
 import lt.viko.eif.kladijev.steamapi.models.Player;
+import lt.viko.eif.kladijev.steamapi.repositories.AdminRepository;
 import lt.viko.eif.kladijev.steamapi.repositories.PlayerRepository;
 import lt.viko.eif.kladijev.steamapi.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -16,30 +18,33 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class DatabaseInitializer
 {
     @Bean
-    public CommandLineRunner initialiseUsers(
-            UserRepository userRepository,
-            PlayerRepository playerRepository,
-            BCryptPasswordEncoder encoder)
+    public CommandLineRunner initialiseUsers(UserRepository userRepository, AdminRepository adminRepository, PlayerRepository playerRepository, BCryptPasswordEncoder encoder)
     {
         return args -> {
             if (userRepository.findAll().isEmpty())
             {
-                // Создание игроков
+                // создание админа
+                Admin admin = new Admin("AdminName", "admin1@example.com", 100, 5000);
+
+                adminRepository.save(admin);
+
+                // создание игроков
                 Player playerOne = new Player("PlayerOne", "player1@example.com", 1, 100);
                 Player playerTwo = new Player("PlayerTwo", "player2@example.com", 2, 250);
 
                 playerRepository.save(playerOne);
                 playerRepository.save(playerTwo);
 
-                // Привязка к пользователям
-                AppUser admin = new AppUser("admin", encoder.encode("password"), "ROLE_ADMIN");
+                // привязка к пользователям
+                AppUser userAdmin = new AppUser("admin", encoder.encode("password"), "ROLE_ADMIN");
                 AppUser userOne = new AppUser("playerOne", encoder.encode("password"), "ROLE_PLAYER");
                 AppUser userTwo = new AppUser("playerTwo", encoder.encode("password"), "ROLE_PLAYER");
 
+                userAdmin.setAdmin(admin);
                 userOne.setPlayer(playerOne);
                 userTwo.setPlayer(playerTwo);
 
-                userRepository.save(admin);
+                userRepository.save(userAdmin);
                 userRepository.save(userOne);
                 userRepository.save(userTwo);
 

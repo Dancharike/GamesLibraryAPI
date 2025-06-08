@@ -12,6 +12,7 @@ import lt.viko.eif.kladijev.steamapi.utility.NotFoundException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,20 +39,27 @@ public class GameResource
      * @return коллекция DTO игр со ссылками.
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public CollectionModel<EntityModel<GameDto>> getAllGames()
     {
         var games = gameRepository.findAll().stream()
                 .map(game -> {
                     GameDto dto = GameMapper.toDto(game);
+                    Long gameId = game.getId();
 
                     var model = EntityModel.of(dto);
-                    model.add(linkTo(methodOn(GameResource.class).getGameById(game.getId())).withSelfRel());
-                    model.add(linkTo(methodOn(GameResource.class).deleteGame(game.getId())).withRel("delete"));
+                    model.add(linkTo(methodOn(GameResource.class).getGameById(gameId)).withSelfRel());
+                    model.add(linkTo(methodOn(GameResource.class).updateGame(gameId, null)).withRel("update"));
+                    model.add(linkTo(methodOn(GameResource.class).deleteGame(gameId)).withRel("delete"));
+                    model.add(linkTo(methodOn(GameResource.class).getGameAchievements(gameId)).withRel("achievements"));
+                    model.add(linkTo(methodOn(GameResource.class).getGameItems(gameId)).withRel("items"));
 
                     return model;
                 }).toList();
 
-        return CollectionModel.of(games, linkTo(methodOn(GameResource.class).getAllGames()).withSelfRel());
+        return CollectionModel.of(games,
+                linkTo(methodOn(GameResource.class).getAllGames()).withSelfRel(),
+                linkTo(methodOn(GameResource.class).createGame(null)).withRel("create"));
     }
 
     /**
@@ -60,6 +68,7 @@ public class GameResource
      * @return DTO игры с HATEOAS ссылками.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public EntityModel<GameDto> getGameById(@PathVariable Long id)
     {
         Game game = gameRepository.findById(id).orElseThrow(() -> new NotFoundException("Game", id));
@@ -67,7 +76,11 @@ public class GameResource
 
         var model = EntityModel.of(dto);
         model.add(linkTo(methodOn(GameResource.class).getGameById(id)).withSelfRel());
+        model.add(linkTo(methodOn(GameResource.class).updateGame(id, null)).withRel("update"));
         model.add(linkTo(methodOn(GameResource.class).deleteGame(id)).withRel("delete"));
+        model.add(linkTo(methodOn(GameResource.class).getGameAchievements(id)).withRel("achievements"));
+        model.add(linkTo(methodOn(GameResource.class).getGameItems(id)).withRel("items"));
+        model.add(linkTo(methodOn(GameResource.class).getAllGames()).withRel("all-games"));
 
         return model;
     }
@@ -108,6 +121,7 @@ public class GameResource
      * @return созданная игра со ссылками.
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public EntityModel<GameDto> createGame(@RequestBody Game game)
     {
         Game saved = gameRepository.save(game);
@@ -123,6 +137,7 @@ public class GameResource
      * @return обновлённая игра со ссылками.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public EntityModel<GameDto> updateGame(@PathVariable Long id, @RequestBody Game updated)
     {
         Game existing = gameRepository.findById(id).orElseThrow(() -> new RuntimeException("Game not found"));
@@ -140,9 +155,10 @@ public class GameResource
     /**
      * Метод для удаления игры со специфическим ID.
      * @param id ID игры.
-     * @return код 204 No Content
+     * @return код 204 No Content.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteGame(@PathVariable Long id)
     {
         gameRepository.deleteById(id);
