@@ -4,12 +4,12 @@ Feature: Access Games by Role
     Given the API is running
 
   Scenario: Admin views games of player by ID
-    Given I am logged in as "admin"
+    Given I am logged in as "admin1"
     When I request games of player with ID "1"
     Then I should receive a list of games
 
   Scenario: Admin views games of player by name
-    Given I am logged in as "admin"
+    Given I am logged in as "admin1"
     When I request games of player with name "playerOne"
     Then I should receive a list of games
 

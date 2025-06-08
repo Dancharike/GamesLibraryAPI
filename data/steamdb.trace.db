@@ -907,3 +907,9 @@ select au1_0.id,au1_0.admin_id,au1_0.password,au1_0.player_id,au1_0.role,au1_0.u
 2025-06-08 18:51:56.219799+03:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "APP_USER" not found (this database is empty); SQL statement:
 select au1_0.id,au1_0.admin_id,au1_0.password,au1_0.player_id,au1_0.role,au1_0.username from app_user au1_0 where au1_0.username=? [42104-224]
+2025-06-08 21:58:39.017492+03:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "APP_USER" not found (this database is empty); SQL statement:
+select au1_0.id,au1_0.admin_id,au1_0.password,au1_0.player_id,au1_0.role,au1_0.username from app_user au1_0 where au1_0.username=? [42104-224]
+2025-06-08 21:58:39.017492+03:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "APP_USER" not found (this database is empty); SQL statement:
+select au1_0.id,au1_0.admin_id,au1_0.password,au1_0.player_id,au1_0.role,au1_0.username from app_user au1_0 where au1_0.username=? [42104-224]

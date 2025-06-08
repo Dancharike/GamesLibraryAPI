@@ -35,6 +35,11 @@ public class PlayerResource
         this.userRepository = userRepository;
     }
 
+    /**
+     * Метод для получения игроком своего списка игр.
+     * @param userDetails роль пользователя.
+     * @return свой список игр.
+     */
     @GetMapping("/me/games")
     public List<Game> getMyGames(@AuthenticationPrincipal UserDetails userDetails)
     {
@@ -47,6 +52,22 @@ public class PlayerResource
         {
             throw new NotFoundException("No Player entity attached to user " + username, 0L);
         }
+
+        return player.getGames();
+    }
+
+    /**
+     * Метод для получения игр игрока по его специфическому имени.
+     * @param name имя игрока.
+     * @return список игр указанного игрока.
+     */
+    @GetMapping("/players/name/{name}/games")
+    public List<Game> getGamesByPlayerName(@PathVariable String name)
+    {
+        Player player = playerRepository.findAll().stream()
+                .filter(p -> p.getNickName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Player", 0L));
 
         return player.getGames();
     }
