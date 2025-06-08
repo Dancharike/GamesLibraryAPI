@@ -37,6 +37,21 @@ public class Game extends BaseEntity
         this.items = items;
     }
 
+    public Game(String gameTitle, String gameGenre, String gameDescription, List<Achievement> achievements,List<Item> items)
+    {
+        this.gameTitle = gameTitle;
+        this.gameGenre = gameGenre;
+        this.gameDescription = gameDescription;
+        this.achievements = achievements;
+    }
+
+    public Game(String gameTitle, String gameGenre, String gameDescription)
+    {
+        this.gameTitle = gameTitle;
+        this.gameGenre = gameGenre;
+        this.gameDescription = gameDescription;
+    }
+
     public Game() {}
 
     public String getGameTitle() {

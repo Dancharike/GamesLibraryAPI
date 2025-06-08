@@ -24,6 +24,13 @@ public class Achievement extends BaseEntity
         this.dateAchieved = dateAchieved;
     }
 
+    public Achievement(String achievementName, String achievementDescription, LocalDateTime dateAchieved)
+    {
+        this.achievementName = achievementName;
+        this.achievementDescription = achievementDescription;
+        this.dateAchieved = dateAchieved;
+    }
+
     public Achievement() {}
 
     public String getAchievementName() {

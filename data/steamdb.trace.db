@@ -901,3 +901,9 @@ java.sql.SQLClientInfoException: Client info name 'ApplicationName' not supporte
 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
 	at java.base/java.lang.Thread.run(Thread.java:1583)
+2025-06-08 18:51:38.688022+03:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "APP_USER" not found (this database is empty); SQL statement:
+select au1_0.id,au1_0.admin_id,au1_0.password,au1_0.player_id,au1_0.role,au1_0.username from app_user au1_0 where au1_0.username=? [42104-224]
+2025-06-08 18:51:56.219799+03:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "APP_USER" not found (this database is empty); SQL statement:
+select au1_0.id,au1_0.admin_id,au1_0.password,au1_0.player_id,au1_0.role,au1_0.username from app_user au1_0 where au1_0.username=? [42104-224]

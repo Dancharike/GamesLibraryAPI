@@ -20,6 +20,13 @@ public class Item extends BaseEntity
         this.cost = cost;
     }
 
+    public Item(String itemName, String itemDescription, Float cost)
+    {
+        this.itemName = itemName;
+        this.itemDescription = itemDescription;
+        this.cost = cost;
+    }
+
     public Item() {}
 
     public String getItemName() {
