@@ -7,6 +7,7 @@ import lt.viko.eif.kladijev.steamapi.mappers.PlayerMapper;
 import lt.viko.eif.kladijev.steamapi.models.*;
 import lt.viko.eif.kladijev.steamapi.repositories.AdminRepository;
 import lt.viko.eif.kladijev.steamapi.repositories.PlayerRepository;
+import lt.viko.eif.kladijev.steamapi.service.CommonMethodsService;
 import lt.viko.eif.kladijev.steamapi.utility.NotFoundException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -30,11 +31,13 @@ public class AdminResource
 {
     private final AdminRepository adminRepository;
     private final PlayerRepository playerRepository;
+    private final CommonMethodsService commonMethodsService;
 
-    public AdminResource(AdminRepository adminRepository, PlayerRepository playerRepository)
+    public AdminResource(AdminRepository adminRepository, PlayerRepository playerRepository, CommonMethodsService commonMethodsService)
     {
         this.adminRepository = adminRepository;
         this.playerRepository = playerRepository;
+        this.commonMethodsService = commonMethodsService;
     }
 
     /**
@@ -193,12 +196,32 @@ public class AdminResource
     @GetMapping("/players/name/{name}/games")
     public List<Game> getGamesByPlayerName(@PathVariable String name)
     {
-        Player player = playerRepository.findAll().stream()
-                .filter(p -> p.getNickName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Player", 0L));
-
+        Player player = commonMethodsService.findPlayerByNickname(name);
         return player.getGames();
+    }
+
+    /**
+     * Метод для получения достижений игрока по его специфическому имени.
+     * @param name имя игрока.
+     * @return список достижений указанного игрока.
+     */
+    @GetMapping("/players/name/{name}/achievements")
+    public List<Achievement> getAchievementByPlayerName(@PathVariable String name)
+    {
+        Player player = commonMethodsService.findPlayerByNickname(name);
+        return player.getAchievements();
+    }
+
+    /**
+     * Метод для получения предметов игрока по его специфическому имени.
+     * @param name имя игрока.
+     * @return список предметов указанного игрока.
+     */
+    @GetMapping("/players/name/{name}/items")
+    public List<Item> getItemsByPlayerName(@PathVariable String name)
+    {
+        Player player = commonMethodsService.findPlayerByNickname(name);
+        return player.getItems();
     }
 
     /**

@@ -9,18 +9,27 @@ import io.cucumber.java.en.When;
 public class AchievementStepdefs extends BaseStepdefs
 {
     @When("I request achievements of player with ID {string}")
-    public void iRequestAchievementsOfPlayerWithID(String arg0) {
-    }
-
-    @Then("I should receive a list of achievements")
-    public void iShouldReceiveAListOfAchievements() {
+    public void iRequestAchievementsOfPlayerWithID(String id)
+    {
+        response = getWithAuth("/admins/players/" + id + "/achievements");
     }
 
     @When("I request achievements of player with name {string}")
-    public void iRequestAchievementsOfPlayerWithName(String arg0) {
+    public void iRequestAchievementsOfPlayerWithName(String name)
+    {
+        response = getWithAuth("/admins/players/name/" + name + "/achievements");
     }
 
     @When("I request my own achievements")
-    public void iRequestMyOwnAchievements() {
+    public void iRequestMyOwnAchievements()
+    {
+        response = getWithAuth("/players/me/achievements");
+    }
+
+    @Then("I should receive a list of achievements")
+    public void iShouldReceiveAListOfAchievements()
+    {
+        response.then().statusCode(200);
+        System.out.println("Achievements: " + response.getBody().asString());
     }
 }
