@@ -94,40 +94,4 @@ public class PlayerResource
 
         return player.getItems();
     }
-
-    /**
-     * Метод для получения игр игрока по его специфическому имени.
-     * @param name имя игрока.
-     * @return список игр указанного игрока.
-     */
-    @GetMapping("/players/name/{name}/games")
-    public List<Game> getGamesByPlayerName(@PathVariable String name)
-    {
-        Player player = commonMethodsService.findPlayerByNickname(name);
-        return player.getGames();
-    }
-
-    /**
-     * Метод для получения достижений игрока по его специфическому имени.
-     * @param name имя игрока.
-     * @return список достижений указанного игрока.
-     */
-    @GetMapping("/players/name/{name}/achievements")
-    public List<Achievement> getAchievementByPlayerName(@PathVariable String name)
-    {
-        Player player = commonMethodsService.findPlayerByNickname(name);
-        return player.getAchievements();
-    }
-
-    /**
-     * Метод для получения предметов игрока по его специфическому имени.
-     * @param name имя игрока.
-     * @return список предметов указанного игрока.
-     */
-    @GetMapping("/players/name/{name}/items")
-    public List<Item> getItemsByPlayerName(@PathVariable String name)
-    {
-        Player player = commonMethodsService.findPlayerByNickname(name);
-        return player.getItems();
-    }
 }

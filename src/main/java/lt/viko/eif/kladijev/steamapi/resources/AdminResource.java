@@ -33,7 +33,9 @@ public class AdminResource
     private final PlayerRepository playerRepository;
     private final CommonMethodsService commonMethodsService;
 
-    public AdminResource(AdminRepository adminRepository, PlayerRepository playerRepository, CommonMethodsService commonMethodsService)
+    public AdminResource(AdminRepository adminRepository,
+                         PlayerRepository playerRepository,
+                         CommonMethodsService commonMethodsService)
     {
         this.adminRepository = adminRepository;
         this.playerRepository = playerRepository;
@@ -54,9 +56,9 @@ public class AdminResource
                     model.add(linkTo(methodOn(AdminResource.class).getPlayerById(player.getId())).withSelfRel());
                     model.add(linkTo(methodOn(AdminResource.class).updatePlayer(player.getId(), null)).withRel("update"));
                     model.add(linkTo(methodOn(AdminResource.class).deletePlayer(player.getId())).withRel("delete"));
-                    model.add(linkTo(methodOn(AdminResource.class).getPlayerGames(player.getId())).withRel("games"));
-                    model.add(linkTo(methodOn(AdminResource.class).getPlayerItems(player.getId())).withRel("items"));
-                    model.add(linkTo(methodOn(AdminResource.class).getPlayerAchievements(player.getId())).withRel("achievements"));
+                    model.add(linkTo(methodOn(AdminResource.class).getPlayerGamesById(player.getId())).withRel("games"));
+                    model.add(linkTo(methodOn(AdminResource.class).getPlayerItemsById(player.getId())).withRel("items"));
+                    model.add(linkTo(methodOn(AdminResource.class).getPlayerAchievementsById(player.getId())).withRel("achievements"));
 
                     return model;
                 }).toList();
@@ -104,9 +106,9 @@ public class AdminResource
         model.add(linkTo(methodOn(AdminResource.class).getPlayerById(id)).withSelfRel());
         model.add(linkTo(methodOn(AdminResource.class).updatePlayer(id, null)).withRel("update"));
         model.add(linkTo(methodOn(AdminResource.class).deletePlayer(id)).withRel("delete"));
-        model.add(linkTo(methodOn(AdminResource.class).getPlayerGames(id)).withRel("games"));
-        model.add(linkTo(methodOn(AdminResource.class).getPlayerItems(id)).withRel("items"));
-        model.add(linkTo(methodOn(AdminResource.class).getPlayerAchievements(id)).withRel("achievements"));
+        model.add(linkTo(methodOn(AdminResource.class).getPlayerGamesById(id)).withRel("games"));
+        model.add(linkTo(methodOn(AdminResource.class).getPlayerItemsById(id)).withRel("items"));
+        model.add(linkTo(methodOn(AdminResource.class).getPlayerAchievementsById(id)).withRel("achievements"));
 
         return model;
     }
@@ -137,7 +139,7 @@ public class AdminResource
      * @return список игр.
      */
     @GetMapping("/players/{id}/games")
-    public CollectionModel<EntityModel<Game>> getPlayerGames(@PathVariable Long id)
+    public CollectionModel<EntityModel<Game>> getPlayerGamesById(@PathVariable Long id)
     {
         Player player = playerRepository.findById(id).orElseThrow(() -> new NotFoundException("Player", id));
 
@@ -147,7 +149,7 @@ public class AdminResource
                         linkTo(methodOn(GameResource.class).deleteGame(game.getId())).withRel("delete")))
                 .toList();
 
-        return CollectionModel.of(games, linkTo(methodOn(AdminResource.class).getPlayerGames(id)).withSelfRel());
+        return CollectionModel.of(games, linkTo(methodOn(AdminResource.class).getPlayerGamesById(id)).withSelfRel());
     }
 
     /**
@@ -156,7 +158,7 @@ public class AdminResource
      * @return список достижений.
      */
     @GetMapping("/players/{id}/achievements")
-    public CollectionModel<EntityModel<Achievement>> getPlayerAchievements(@PathVariable Long id)
+    public CollectionModel<EntityModel<Achievement>> getPlayerAchievementsById(@PathVariable Long id)
     {
         Player player = playerRepository.findById(id).orElseThrow(() -> new NotFoundException("Player", id));
 
@@ -166,7 +168,7 @@ public class AdminResource
                         linkTo(methodOn(AchievementResource.class).deleteAchievement(a.getId())).withRel("delete")))
                 .toList();
 
-        return CollectionModel.of(achievements, linkTo(methodOn(AdminResource.class).getPlayerAchievements(id)).withSelfRel());
+        return CollectionModel.of(achievements, linkTo(methodOn(AdminResource.class).getPlayerAchievementsById(id)).withSelfRel());
     }
 
     /**
@@ -175,7 +177,7 @@ public class AdminResource
      * @return список предметов.
      */
     @GetMapping("/players/{id}/items")
-    public CollectionModel<EntityModel<Item>> getPlayerItems(@PathVariable Long id)
+    public CollectionModel<EntityModel<Item>> getPlayerItemsById(@PathVariable Long id)
     {
         Player player = playerRepository.findById(id).orElseThrow(() -> new NotFoundException("Player", id));
 
@@ -185,43 +187,7 @@ public class AdminResource
                         linkTo(methodOn(ItemResource.class).deleteItem(item.getId())).withRel("delete")))
                 .toList();
 
-        return CollectionModel.of(items, linkTo(methodOn(AdminResource.class).getPlayerItems(id)).withSelfRel());
-    }
-
-    /**
-     * Метод для получения игр игрока по его специфическому имени.
-     * @param name имя игрока.
-     * @return список игр указанного игрока.
-     */
-    @GetMapping("/players/name/{name}/games")
-    public List<Game> getGamesByPlayerName(@PathVariable String name)
-    {
-        Player player = commonMethodsService.findPlayerByNickname(name);
-        return player.getGames();
-    }
-
-    /**
-     * Метод для получения достижений игрока по его специфическому имени.
-     * @param name имя игрока.
-     * @return список достижений указанного игрока.
-     */
-    @GetMapping("/players/name/{name}/achievements")
-    public List<Achievement> getAchievementByPlayerName(@PathVariable String name)
-    {
-        Player player = commonMethodsService.findPlayerByNickname(name);
-        return player.getAchievements();
-    }
-
-    /**
-     * Метод для получения предметов игрока по его специфическому имени.
-     * @param name имя игрока.
-     * @return список предметов указанного игрока.
-     */
-    @GetMapping("/players/name/{name}/items")
-    public List<Item> getItemsByPlayerName(@PathVariable String name)
-    {
-        Player player = commonMethodsService.findPlayerByNickname(name);
-        return player.getItems();
+        return CollectionModel.of(items, linkTo(methodOn(AdminResource.class).getPlayerItemsById(id)).withSelfRel());
     }
 
     /**

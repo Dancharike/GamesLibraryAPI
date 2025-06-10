@@ -6,6 +6,7 @@ import lt.viko.eif.kladijev.steamapi.dto.ItemDto;
 import lt.viko.eif.kladijev.steamapi.mappers.AchievementMapper;
 import lt.viko.eif.kladijev.steamapi.mappers.GameMapper;
 import lt.viko.eif.kladijev.steamapi.mappers.ItemMapper;
+import lt.viko.eif.kladijev.steamapi.models.Achievement;
 import lt.viko.eif.kladijev.steamapi.models.Game;
 import lt.viko.eif.kladijev.steamapi.repositories.GameRepository;
 import lt.viko.eif.kladijev.steamapi.utility.NotFoundException;
@@ -51,8 +52,8 @@ public class GameResource
                     model.add(linkTo(methodOn(GameResource.class).getGameById(gameId)).withSelfRel());
                     model.add(linkTo(methodOn(GameResource.class).updateGame(gameId, null)).withRel("update"));
                     model.add(linkTo(methodOn(GameResource.class).deleteGame(gameId)).withRel("delete"));
-                    model.add(linkTo(methodOn(GameResource.class).getGameAchievements(gameId)).withRel("achievements"));
-                    model.add(linkTo(methodOn(GameResource.class).getGameItems(gameId)).withRel("items"));
+                    model.add(linkTo(methodOn(GameResource.class).getGameAchievementsByID(gameId)).withRel("achievements"));
+                    model.add(linkTo(methodOn(GameResource.class).getGameItemsByID(gameId)).withRel("items"));
 
                     return model;
                 }).toList();
@@ -78,8 +79,8 @@ public class GameResource
         model.add(linkTo(methodOn(GameResource.class).getGameById(id)).withSelfRel());
         model.add(linkTo(methodOn(GameResource.class).updateGame(id, null)).withRel("update"));
         model.add(linkTo(methodOn(GameResource.class).deleteGame(id)).withRel("delete"));
-        model.add(linkTo(methodOn(GameResource.class).getGameAchievements(id)).withRel("achievements"));
-        model.add(linkTo(methodOn(GameResource.class).getGameItems(id)).withRel("items"));
+        model.add(linkTo(methodOn(GameResource.class).getGameAchievementsByID(id)).withRel("achievements"));
+        model.add(linkTo(methodOn(GameResource.class).getGameItemsByID(id)).withRel("items"));
         model.add(linkTo(methodOn(GameResource.class).getAllGames()).withRel("all-games"));
 
         return model;
@@ -91,7 +92,8 @@ public class GameResource
      * @return список DTO достижений.
      */
     @GetMapping("/{id}/achievements")
-    public List<AchievementDto> getGameAchievements(@PathVariable Long id)
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<AchievementDto> getGameAchievementsByID(@PathVariable Long id)
     {
         Game game = gameRepository.findById(id).orElseThrow(() -> new RuntimeException("Game not found"));
 
@@ -106,9 +108,55 @@ public class GameResource
      * @return список DTO предметов.
      */
     @GetMapping("/{id}/items")
-    public List<ItemDto> getGameItems(@PathVariable Long id)
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<ItemDto> getGameItemsByID(@PathVariable Long id)
     {
         Game game = gameRepository.findById(id).orElseThrow(() -> new RuntimeException("Game not found"));
+
+        return game.getItems().stream()
+                .map(ItemMapper::toDto)
+                .toList();
+    }
+
+    /**
+     * Метод для нахождения достижений по названию игры.
+     * @param name название игры.
+     * @return список DTO предметов.
+     */
+    @GetMapping("/name/{name}/achievements")
+    public List<AchievementDto> getGameAchievementsByName(@PathVariable String name)
+    {
+        Game game = gameRepository.findByGameTitle(name).orElseThrow(() -> new NotFoundException("Game", name));
+
+        return game.getAchievements().stream()
+                .map(AchievementMapper::toDto)
+                .toList();
+    }
+
+    /*
+    @GetMapping("/name/{name}/achievements")
+    public CollectionModel<EntityModel<Achievement>> getGameAchievementsByName(@PathVariable String name)
+    {
+        Game game = gameRepository.findByGameTitle(name).orElseThrow(() -> new NotFoundException("Game", name));
+
+        List<EntityModel<Achievement>> achievements = game.getAchievements().stream()
+                .map(a -> EntityModel.of(a,
+                        linkTo(methodOn(AchievementResource.class).getAchievementById(a.getId())).withSelfRel(),
+                        linkTo(methodOn(AchievementResource.class).deleteAchievement(a.getId())).withRel("delete")))
+                .toList();
+
+        return CollectionModel.of(achievements, linkTo(methodOn(GameResource.class).getGameAchievementsByName(name)).withSelfRel());
+    }
+    */
+    /**
+     * Метод для нахождения предметов по названию игры.
+     * @param name название игры.
+     * @return список DTO предметов.
+     */
+    @GetMapping("/name/{name}/items")
+    public List<ItemDto> getGameItemsByName(@PathVariable String name)
+    {
+        Game game = gameRepository.findByGameTitle(name).orElseThrow(() -> new NotFoundException("Game", name));
 
         return game.getItems().stream()
                 .map(ItemMapper::toDto)
