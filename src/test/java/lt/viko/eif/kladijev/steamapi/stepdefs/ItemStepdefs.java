@@ -17,7 +17,7 @@ public class ItemStepdefs extends BaseStepdefs
     @When("I request items of player with name {string}")
     public void iRequestItemsOfPlayerWithName(String name)
     {
-        response = getWithAuth("/admins/players/name/" + name + "/items");
+        response = getWithAuth("/shared/players/name/" + name + "/items");
     }
 
     @When("I request my own items")

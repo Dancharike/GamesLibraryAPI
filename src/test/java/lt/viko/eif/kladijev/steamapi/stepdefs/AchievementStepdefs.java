@@ -17,7 +17,7 @@ public class AchievementStepdefs extends BaseStepdefs
     @When("I request achievements of player with name {string}")
     public void iRequestAchievementsOfPlayerWithName(String name)
     {
-        response = getWithAuth("/admins/players/name/" + name + "/achievements");
+        response = getWithAuth("/shared/players/name/" + name + "/achievements");
     }
 
     @When("I request my own achievements")

@@ -16,7 +16,7 @@ public class GameStepdefs extends BaseStepdefs
     @When("I request games of player with name {string}")
     public void iRequestGamesOfPlayerWithName(String name)
     {
-        response = getWithAuth("/admins/players/name/" + name + "/games");
+        response = getWithAuth("/shared/players/name/" + name + "/games");
     }
 
     @When("I request my own games")
