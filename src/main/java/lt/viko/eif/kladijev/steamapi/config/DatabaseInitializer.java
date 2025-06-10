@@ -84,13 +84,13 @@ public class DatabaseInitializer
                 playerRepository.saveAll(List.of(playerOne, playerTwo, playerThree));
 
                 // создание пользователей
-                AppUser user1 = new AppUser("admin1", encoder.encode("password"), "ROLE_ADMIN");
-                AppUser user2 = new AppUser("admin2", encoder.encode("password"), "ROLE_ADMIN");
-                AppUser user3 = new AppUser("admin3", encoder.encode("password"), "ROLE_ADMIN");
+                AppUser user1 = new AppUser("admin1", encoder.encode("password"), UserRole.ROLE_ADMIN);
+                AppUser user2 = new AppUser("admin2", encoder.encode("password"), UserRole.ROLE_ADMIN);
+                AppUser user3 = new AppUser("admin3", encoder.encode("password"), UserRole.ROLE_ADMIN);
 
-                AppUser user4 = new AppUser("playerOne", encoder.encode("password"), "ROLE_PLAYER");
-                AppUser user5 = new AppUser("playerTwo", encoder.encode("password"), "ROLE_PLAYER");
-                AppUser user6 = new AppUser("playerThree", encoder.encode("password"), "ROLE_PLAYER");
+                AppUser user4 = new AppUser("playerOne", encoder.encode("password"), UserRole.ROLE_PLAYER);
+                AppUser user5 = new AppUser("playerTwo", encoder.encode("password"), UserRole.ROLE_PLAYER);
+                AppUser user6 = new AppUser("playerThree", encoder.encode("password"), UserRole.ROLE_PLAYER);
 
                 user1.setAdmin(adminOne);
                 user2.setAdmin(adminTwo);

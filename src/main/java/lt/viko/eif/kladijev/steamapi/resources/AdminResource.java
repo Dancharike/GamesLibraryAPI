@@ -7,12 +7,14 @@ import lt.viko.eif.kladijev.steamapi.mappers.PlayerMapper;
 import lt.viko.eif.kladijev.steamapi.models.*;
 import lt.viko.eif.kladijev.steamapi.repositories.AdminRepository;
 import lt.viko.eif.kladijev.steamapi.repositories.PlayerRepository;
+import lt.viko.eif.kladijev.steamapi.repositories.UserRepository;
 import lt.viko.eif.kladijev.steamapi.service.CommonMethodsService;
 import lt.viko.eif.kladijev.steamapi.utility.NotFoundException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,14 +34,21 @@ public class AdminResource
     private final AdminRepository adminRepository;
     private final PlayerRepository playerRepository;
     private final CommonMethodsService commonMethodsService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     public AdminResource(AdminRepository adminRepository,
                          PlayerRepository playerRepository,
-                         CommonMethodsService commonMethodsService)
+                         CommonMethodsService commonMethodsService,
+                         BCryptPasswordEncoder passwordEncoder,
+                         UserRepository userRepository
+    )
     {
         this.adminRepository = adminRepository;
         this.playerRepository = playerRepository;
         this.commonMethodsService = commonMethodsService;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -199,6 +208,14 @@ public class AdminResource
     public EntityModel<PlayerDto> createPlayer(@RequestBody Player player)
     {
         Player savedPlayer = playerRepository.save(player);
+
+        AppUser user = new AppUser();
+        user.setUsername(player.getNickName());
+        user.setPassword(passwordEncoder.encode("password"));
+        user.setRole(UserRole.ROLE_PLAYER);
+        user.setPlayer(savedPlayer);
+        userRepository.save(user);
+
         PlayerDto dto = PlayerMapper.toDto(savedPlayer);
 
         return EntityModel.of(dto,
@@ -215,6 +232,14 @@ public class AdminResource
     public EntityModel<AdminDto> createAdmin(@RequestBody Admin admin)
     {
         Admin savedAdmin = adminRepository.save(admin);
+
+        AppUser user = new AppUser();
+        user.setUsername(admin.getNickName());
+        user.setPassword(passwordEncoder.encode("password"));
+        user.setRole(UserRole.ROLE_ADMIN);
+        user.setAdmin(savedAdmin);
+        userRepository.save(user);
+
         AdminDto dto = AdminMapper.toDto(savedAdmin);
 
         return EntityModel.of(dto,
@@ -224,6 +249,7 @@ public class AdminResource
 
     /**
      * Метод для обновления информации об игроке со специфическим ID.
+     * Метод поддерживает возможность обновления только нескольких параметров.
      * @param id ID игрока.
      * @param updatedPlayer новые данные игрока.
      * @return обновлённый игрок.
@@ -233,10 +259,22 @@ public class AdminResource
     {
         Player player = playerRepository.findById(id).orElseThrow(() -> new NotFoundException("Player", id));
 
-        player.setNickName(updatedPlayer.getNickName());
-        player.setEmail(updatedPlayer.getEmail());
-        player.setLevel(updatedPlayer.getLevel());
-        player.setExperience(updatedPlayer.getExperience());
+        if(updatedPlayer.getNickName() != null)
+        {
+            player.setNickName(updatedPlayer.getNickName());
+        }
+        if(updatedPlayer.getEmail() != null)
+        {
+            player.setEmail(updatedPlayer.getEmail());
+        }
+        if(updatedPlayer.getLevel() != null)
+        {
+            player.setLevel(updatedPlayer.getLevel());
+        }
+        if(updatedPlayer.getExperience() != null)
+        {
+            player.setExperience(updatedPlayer.getExperience());
+        }
 
         Player saved = playerRepository.save(player);
         PlayerDto dto = PlayerMapper.toDto(saved);
@@ -246,6 +284,7 @@ public class AdminResource
 
     /**
      * Метод для обновления данных админа.
+     * Метод поддерживает возможность обновления только нескольких параметров.
      * @param id ID админа.
      * @param updatedAdmin новые данные админа.
      * @return обновлённый админ.
@@ -255,10 +294,22 @@ public class AdminResource
     {
         Admin admin = adminRepository.findById(id).orElseThrow(() -> new NotFoundException("Admin", id));
 
-        admin.setNickName(updatedAdmin.getNickName());
-        admin.setEmail(updatedAdmin.getEmail());
-        admin.setLevel(updatedAdmin.getLevel());
-        admin.setExperience(updatedAdmin.getExperience());
+        if(updatedAdmin.getNickName() != null)
+        {
+            admin.setNickName(updatedAdmin.getNickName());
+        }
+        if(updatedAdmin.getEmail() != null)
+        {
+            admin.setEmail(updatedAdmin.getEmail());
+        }
+        if(updatedAdmin.getLevel() != null)
+        {
+            admin.setLevel(updatedAdmin.getLevel());
+        }
+        if(updatedAdmin.getExperience() != null)
+        {
+            admin.setExperience(updatedAdmin.getExperience());
+        }
 
         Admin saved = adminRepository.save(admin);
         AdminDto dto = AdminMapper.toDto(saved);
@@ -274,7 +325,15 @@ public class AdminResource
     @DeleteMapping("/players/{id}/delete")
     public ResponseEntity<?> deletePlayer(@PathVariable Long id)
     {
-        playerRepository.deleteById(id);
+        Player player = playerRepository.findById(id).orElseThrow(() -> new NotFoundException("Player", id));
+
+        userRepository.findByPlayer(player).ifPresent(user -> {
+            user.setPlayer(null);
+            userRepository.save(user);
+            userRepository.delete(user);
+        });
+
+        playerRepository.delete(player);
         return ResponseEntity.noContent().build();
     }
 
@@ -286,7 +345,15 @@ public class AdminResource
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<?> deleteAdmin(@PathVariable Long id)
     {
-        adminRepository.deleteById(id);
+        Admin admin = adminRepository.findById(id).orElseThrow(() -> new NotFoundException("Admin", id));
+
+        userRepository.findByAdmin(admin).ifPresent(user -> {
+            user.setAdmin(null);
+            userRepository.save(user);
+            userRepository.delete(user);
+        });
+
+        adminRepository.delete(admin);
         return ResponseEntity.noContent().build();
     }
 }

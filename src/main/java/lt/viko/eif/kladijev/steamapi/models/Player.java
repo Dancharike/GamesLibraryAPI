@@ -108,7 +108,7 @@ public class Player extends BaseEntity
         this.email = email;
     }
 
-    public int getLevel() {
+    public Integer getLevel() {
         return level;
     }
 
@@ -116,7 +116,7 @@ public class Player extends BaseEntity
         this.level = level;
     }
 
-    public int getExperience() {
+    public Integer getExperience() {
         return experience;
     }
 

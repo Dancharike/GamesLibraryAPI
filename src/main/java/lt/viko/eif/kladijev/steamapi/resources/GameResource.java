@@ -6,7 +6,6 @@ import lt.viko.eif.kladijev.steamapi.dto.ItemDto;
 import lt.viko.eif.kladijev.steamapi.mappers.AchievementMapper;
 import lt.viko.eif.kladijev.steamapi.mappers.GameMapper;
 import lt.viko.eif.kladijev.steamapi.mappers.ItemMapper;
-import lt.viko.eif.kladijev.steamapi.models.Achievement;
 import lt.viko.eif.kladijev.steamapi.models.Game;
 import lt.viko.eif.kladijev.steamapi.repositories.GameRepository;
 import lt.viko.eif.kladijev.steamapi.utility.NotFoundException;
@@ -124,6 +123,7 @@ public class GameResource
      * @return список DTO предметов.
      */
     @GetMapping("/name/{name}/achievements")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PLAYER')")
     public List<AchievementDto> getGameAchievementsByName(@PathVariable String name)
     {
         Game game = gameRepository.findByGameTitle(name).orElseThrow(() -> new NotFoundException("Game", name));
@@ -133,27 +133,13 @@ public class GameResource
                 .toList();
     }
 
-    /*
-    @GetMapping("/name/{name}/achievements")
-    public CollectionModel<EntityModel<Achievement>> getGameAchievementsByName(@PathVariable String name)
-    {
-        Game game = gameRepository.findByGameTitle(name).orElseThrow(() -> new NotFoundException("Game", name));
-
-        List<EntityModel<Achievement>> achievements = game.getAchievements().stream()
-                .map(a -> EntityModel.of(a,
-                        linkTo(methodOn(AchievementResource.class).getAchievementById(a.getId())).withSelfRel(),
-                        linkTo(methodOn(AchievementResource.class).deleteAchievement(a.getId())).withRel("delete")))
-                .toList();
-
-        return CollectionModel.of(achievements, linkTo(methodOn(GameResource.class).getGameAchievementsByName(name)).withSelfRel());
-    }
-    */
     /**
      * Метод для нахождения предметов по названию игры.
      * @param name название игры.
      * @return список DTO предметов.
      */
     @GetMapping("/name/{name}/items")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PLAYER')")
     public List<ItemDto> getGameItemsByName(@PathVariable String name)
     {
         Game game = gameRepository.findByGameTitle(name).orElseThrow(() -> new NotFoundException("Game", name));

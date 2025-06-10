@@ -3,6 +3,7 @@ package lt.viko.eif.kladijev.steamapi.config;
 import lt.viko.eif.kladijev.steamapi.security.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -37,7 +38,8 @@ public class SecurityConfig
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/api-docs/**", "/h2-console/**").permitAll()
                         .requestMatchers("/api/players/**").hasAnyRole("ADMIN", "PLAYER")
-                        .requestMatchers("/api/games/**", "/api/items/**", "/api/achievements/**").hasRole("ADMIN")
+                        //.requestMatchers("/api/games/**", "/api/items/**", "/api/achievements/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

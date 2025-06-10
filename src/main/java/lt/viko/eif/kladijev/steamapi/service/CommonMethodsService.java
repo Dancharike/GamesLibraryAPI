@@ -6,7 +6,7 @@ import lt.viko.eif.kladijev.steamapi.utility.NotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * Класс сервис предназначенный для общих вспомогательных методов разных контроллеров.
+ * Класс сервис предназначенный для общих вспомогательных или часто используемых методов разных контроллеров.
  */
 @Service
 public class CommonMethodsService
@@ -24,5 +24,10 @@ public class CommonMethodsService
                 .filter(p -> p.getNickName().equalsIgnoreCase(nickname))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Player", 0L));
+    }
+
+    public Player findPlayerById(Long id)
+    {
+        return playerRepository.findById(id).orElseThrow(() -> new NotFoundException("Player", id));
     }
 }

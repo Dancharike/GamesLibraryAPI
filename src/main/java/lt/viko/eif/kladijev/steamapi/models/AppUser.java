@@ -11,7 +11,8 @@ public class AppUser extends BaseEntity
     @Column(unique = true)
     private String username;
     private String password;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     @OneToOne
     @JoinColumn(name = "admin_id")
@@ -21,7 +22,7 @@ public class AppUser extends BaseEntity
     @JoinColumn(name = "player_id")
     private Player player;
 
-    public AppUser(String username, String password, String role)
+    public AppUser(String username, String password, UserRole role)
     {
         this.username = username;
         this.password = password;
@@ -46,11 +47,11 @@ public class AppUser extends BaseEntity
         this.password = password;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
