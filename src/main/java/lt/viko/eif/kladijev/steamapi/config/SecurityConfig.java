@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,6 +38,7 @@ public class SecurityConfig
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/api-docs/**", "/h2-console/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "api/players/register").permitAll()
                         .requestMatchers("/api/players/**").hasAnyRole("ADMIN", "PLAYER")
                         //.requestMatchers("/api/games/**", "/api/items/**", "/api/achievements/**").hasRole("ADMIN")
 
@@ -49,8 +51,9 @@ public class SecurityConfig
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception
-    {
-        return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(HttpSecurity http, DaoAuthenticationProvider provider) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .authenticationProvider(provider)
+                .build();
     }
 }

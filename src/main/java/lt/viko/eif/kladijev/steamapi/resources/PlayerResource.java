@@ -1,6 +1,7 @@
 package lt.viko.eif.kladijev.steamapi.resources;
 
 import lt.viko.eif.kladijev.steamapi.dto.PlayerDto;
+import lt.viko.eif.kladijev.steamapi.dto.RegisterRequest;
 import lt.viko.eif.kladijev.steamapi.mappers.PlayerMapper;
 import lt.viko.eif.kladijev.steamapi.models.*;
 import lt.viko.eif.kladijev.steamapi.repositories.*;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -125,6 +127,36 @@ public class PlayerResource
         }
 
         return player.getItems();
+    }
+
+    /**
+     * Метод для регистрации нового игрока.
+     * @param request запрос ввода.
+     * @return созданного игрока.
+     */
+    @PostMapping("/register")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<?> registerPlayer(@RequestBody RegisterRequest request)
+    {
+        if(userRepository.existsByUsername(request.username))
+        {
+            return ResponseEntity.badRequest().body("Username is already taken!");
+        }
+
+        AppUser user = new AppUser();
+        user.setUsername(request.username);
+        user.setPassword(new BCryptPasswordEncoder().encode(request.password));
+        user.setRole(UserRole.ROLE_PLAYER);
+
+        Player player = new Player();
+        player.setNickName(request.username);
+        player.setEmail(request.email);
+        user.setPlayer(player);
+
+        userRepository.save(user);
+        playerRepository.save(player);
+
+        return ResponseEntity.ok("Player registered successfully");
     }
 
     /**

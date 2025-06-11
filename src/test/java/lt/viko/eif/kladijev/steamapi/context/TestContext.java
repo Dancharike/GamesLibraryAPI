@@ -8,6 +8,7 @@ import io.restassured.response.Response;
 public class TestContext
 {
     private static final ThreadLocal<String> currentUser = new ThreadLocal<>();
+    private static String currentPassword;
     private static Response response;
 
     public static Response getResponse() {
@@ -26,6 +27,16 @@ public class TestContext
     public static String getCurrentUser()
     {
         return currentUser.get();
+    }
+
+    public static String getCurrentPassword()
+    {
+        return currentPassword;
+    }
+
+    public static void setCurrentPassword(String password)
+    {
+        currentPassword = password;
     }
 
     public static void clear()

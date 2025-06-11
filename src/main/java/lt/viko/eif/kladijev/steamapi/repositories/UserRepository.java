@@ -12,4 +12,5 @@ public interface UserRepository extends JpaRepository<AppUser, Long>
     Optional<AppUser> findByUsername(String username);
     Optional<AppUser> findByAdmin(Admin admin);
     Optional<AppUser> findByPlayer(Player player);
+    boolean existsByUsername(String username);
 }

@@ -19,7 +19,11 @@ import java.util.List;
 public class DatabaseInitializer
 {
     @Bean
-    public CommandLineRunner initialiseUsers(UserRepository userRepository, AdminRepository adminRepository, PlayerRepository playerRepository, BCryptPasswordEncoder encoder)
+    public CommandLineRunner initialiseUsers(UserRepository userRepository,
+                                             AdminRepository adminRepository,
+                                             PlayerRepository playerRepository,
+                                             BCryptPasswordEncoder encoder
+    )
     {
         return args -> {
             if (userRepository.findAll().isEmpty())
@@ -35,23 +39,27 @@ public class DatabaseInitializer
                 Player playerOne = new Player("PlayerOne", "player1@example.com", 1, 100);
                 Player playerTwo = new Player("PlayerTwo", "player2@example.com", 2, 250);
                 Player playerThree = new Player("PlayerThree", "player3@example.com", 3, 500);
+                Player playerToDelete = new Player("PlayerToDelete", "playerToDelete@example.com", 4, 1000);
 
                 // создание игр
                 Game game1 = new Game("Half-Life", "First-person shooter", "Cool Game");
                 Game game2 = new Game("Stardew Valley", "Farming simulator", "Not a cool game");
                 Game game3 = new Game("The Witcher 3", "RPG", "Also cool game");
+                Game gameToDelete = new Game("GameToDelete", "GameToDelete", "GameToDelete");
 
                 // создание достижений
                 Achievement ach1 = new Achievement("Headshot Master", "Get 100 headshots", LocalDateTime.now().minusDays(10));
                 Achievement ach2 = new Achievement("Crop King", "Harvest 100 crops", LocalDateTime.now().minusDays(5));
                 Achievement ach3 = new Achievement("Monster Slayer", "Kill 50 monsters", LocalDateTime.now().minusDays(3));
                 Achievement ach4 = new Achievement("Explorer", "Visit 10 locations", LocalDateTime.now().minusDays(7));
+                Achievement achToDelete = new Achievement("AchievementToDelete", "AchievementToDelete", LocalDateTime.now().minusDays(15));
 
                 // создание предметов
                 Item item1 = new Item("Gravity Gun", "Experimental weapon", 199.99f);
                 Item item2 = new Item("Golden Hoe", "Legendary farming tool", 49.99f);
                 Item item3 = new Item("Silver Sword", "Witcher weapon", 149.99f);
                 Item item4 = new Item("Teleportation Rune", "Instant travel", 89.99f);
+                Item itemToDelete = new Item("ItemToDelete", "ItemToDelete", 199.99f);
 
                 // привязка к играм
                 game1.getAchievements().add(ach1);
@@ -64,6 +72,9 @@ public class DatabaseInitializer
                 game3.getAchievements().add(ach4);
                 game3.getItems().add(item3);
                 game3.getItems().add(item4);
+
+                gameToDelete.getAchievements().add(achToDelete);
+                gameToDelete.getItems().add(itemToDelete);
 
                 // привязка к игрокам
                 playerOne.getGames().add(game1);
@@ -80,8 +91,12 @@ public class DatabaseInitializer
                 playerThree.getItems().add(item3);       // соответствует
                 playerThree.getItems().add(item4);       // тоже
 
+                playerToDelete.getGames().add(gameToDelete);
+                playerToDelete.getAchievements().add(achToDelete);
+                playerToDelete.getItems().add(itemToDelete);
+
                 // сохранение игроков
-                playerRepository.saveAll(List.of(playerOne, playerTwo, playerThree));
+                playerRepository.saveAll(List.of(playerOne, playerTwo, playerThree, playerToDelete));
 
                 // создание пользователей
                 AppUser user1 = new AppUser("admin1", encoder.encode("password"), UserRole.ROLE_ADMIN);
@@ -91,6 +106,7 @@ public class DatabaseInitializer
                 AppUser user4 = new AppUser("playerOne", encoder.encode("password"), UserRole.ROLE_PLAYER);
                 AppUser user5 = new AppUser("playerTwo", encoder.encode("password"), UserRole.ROLE_PLAYER);
                 AppUser user6 = new AppUser("playerThree", encoder.encode("password"), UserRole.ROLE_PLAYER);
+                AppUser user7 = new AppUser("playerToDelete", encoder.encode("password"), UserRole.ROLE_PLAYER);
 
                 user1.setAdmin(adminOne);
                 user2.setAdmin(adminTwo);
@@ -99,8 +115,9 @@ public class DatabaseInitializer
                 user4.setPlayer(playerOne);
                 user5.setPlayer(playerTwo);
                 user6.setPlayer(playerThree);
+                user7.setPlayer(playerToDelete);
 
-                userRepository.saveAll(List.of(user1, user2, user3, user4, user5, user6));
+                userRepository.saveAll(List.of(user1, user2, user3, user4, user5, user6, user7));
 
                 System.out.println("Initial users and players created.");
             }
