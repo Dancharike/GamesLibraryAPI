@@ -87,7 +87,11 @@ public class ItemResource
         Item saved = itemRepository.save(item);
         ItemDto dto = ItemMapper.toDto(saved);
 
-        return EntityModel.of(dto, linkTo(methodOn(ItemResource.class).getItemById(saved.getId())).withSelfRel());
+        return EntityModel.of(dto,
+                linkTo(methodOn(ItemResource.class).getItemById(saved.getId())).withSelfRel(),
+                linkTo(methodOn(ItemResource.class).updateItem(saved.getId(), null)).withRel("update"),
+                linkTo(methodOn(ItemResource.class).deleteItem(saved.getId())).withRel("delete"),
+                linkTo(methodOn(ItemResource.class).getAllItems()).withRel("all-items"));
     }
 
     /**
@@ -109,7 +113,10 @@ public class ItemResource
         Item saved = itemRepository.save(existing);
         ItemDto dto = ItemMapper.toDto(saved);
 
-        return EntityModel.of(dto, linkTo(methodOn(ItemResource.class).getItemById(saved.getId())).withSelfRel());
+        return EntityModel.of(dto,
+                linkTo(methodOn(ItemResource.class).getItemById(saved.getId())).withSelfRel(),
+                linkTo(methodOn(ItemResource.class).deleteItem(saved.getId())).withRel("delete"),
+                linkTo(methodOn(ItemResource.class).getAllItems()).withRel("all-items"));
     }
 
     /**
@@ -122,6 +129,12 @@ public class ItemResource
     public ResponseEntity<?> deleteItem(@PathVariable Long id)
     {
         itemRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+
+        var model = EntityModel.of("Item deleted successfully!");
+        model.add(linkTo(methodOn(ItemResource.class).getAllItems()).withRel("all-items"));
+        model.add(linkTo(methodOn(ItemResource.class).createItem(null)).withRel("create"));
+
+        //return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(model);
     }
 }

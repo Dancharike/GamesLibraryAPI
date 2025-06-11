@@ -87,7 +87,11 @@ public class AchievementResource
         Achievement saved = achievementRepository.save(achievement);
         AchievementDto dto = AchievementMapper.toDto(saved);
 
-        return EntityModel.of(dto, linkTo(methodOn(AchievementResource.class).getAchievementById(saved.getId())).withSelfRel());
+        return EntityModel.of(dto,
+                linkTo(methodOn(AchievementResource.class).getAchievementById(saved.getId())).withSelfRel(),
+                linkTo(methodOn(AchievementResource.class).updateAchievement(saved.getId(), null)).withRel("update"),
+                linkTo(methodOn(AchievementResource.class).deleteAchievement(saved.getId())).withRel("delete"),
+                linkTo(methodOn(AchievementResource.class).getAllAchievements()).withRel("all-achievements"));
     }
 
     /**
@@ -109,7 +113,10 @@ public class AchievementResource
         Achievement saved = achievementRepository.save(ach);
         AchievementDto dto = AchievementMapper.toDto(saved);
 
-        return EntityModel.of(dto, linkTo(methodOn(AchievementResource.class).getAchievementById(saved.getId())).withSelfRel());
+        return EntityModel.of(dto,
+                linkTo(methodOn(AchievementResource.class).getAchievementById(saved.getId())).withSelfRel(),
+                linkTo(methodOn(AchievementResource.class).deleteAchievement(saved.getId())).withRel("delete"),
+                linkTo(methodOn(AchievementResource.class).getAllAchievements()).withRel("all-achievements"));
     }
 
     /**
@@ -122,6 +129,12 @@ public class AchievementResource
     public ResponseEntity<?> deleteAchievement(@PathVariable Long id)
     {
         achievementRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+
+        var model = EntityModel.of("Achievement deleted successfully!");
+        model.add(linkTo(methodOn(AchievementResource.class).getAllAchievements()).withRel("all-achievements"));
+        model.add(linkTo(methodOn(AchievementResource.class).createAchievement(null)).withRel("create"));
+
+        //return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(model);
     }
 }

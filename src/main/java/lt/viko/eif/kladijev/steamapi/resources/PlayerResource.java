@@ -7,6 +7,7 @@ import lt.viko.eif.kladijev.steamapi.models.*;
 import lt.viko.eif.kladijev.steamapi.repositories.*;
 import lt.viko.eif.kladijev.steamapi.service.CommonMethodsService;
 import lt.viko.eif.kladijev.steamapi.utility.NotFoundException;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,7 +73,7 @@ public class PlayerResource
      * @return свой список игр.
      */
     @GetMapping("/me/games")
-    public List<Game> getMyGames(@AuthenticationPrincipal UserDetails userDetails)
+    public CollectionModel<EntityModel<Game>> getMyGames(@AuthenticationPrincipal UserDetails userDetails)
     {
         String username = userDetails.getUsername();
 
@@ -84,7 +85,15 @@ public class PlayerResource
             throw new NotFoundException("No Player entity attached to user " + username, 0L);
         }
 
-        return player.getGames();
+        List<EntityModel<Game>> games = player.getGames().stream()
+                .map(game -> EntityModel.of(game,
+                        linkTo(methodOn(GameResource.class).getGameById(game.getId())).withSelfRel(),
+                        linkTo(methodOn(GameResource.class).updateGame(game.getId(), null)).withRel("update"),
+                        linkTo(methodOn(GameResource.class).deleteGame(game.getId())).withRel("delete")))
+                .toList();
+
+        //return player.getGames();
+        return CollectionModel.of(games, linkTo(methodOn(PlayerResource.class).getMyGames(userDetails)).withSelfRel());
     }
 
     /**
@@ -93,7 +102,7 @@ public class PlayerResource
      * @return свой список достижений.
      */
     @GetMapping("/me/achievements")
-    public List<Achievement> getMyAchievements(@AuthenticationPrincipal UserDetails userDetails)
+    public CollectionModel<EntityModel<Achievement>> getMyAchievements(@AuthenticationPrincipal UserDetails userDetails)
     {
         String username = userDetails.getUsername();
 
@@ -105,7 +114,15 @@ public class PlayerResource
             throw new NotFoundException("No Player entity attached to user " + username, 0L);
         }
 
-        return player.getAchievements();
+        List<EntityModel<Achievement>> ach = player.getAchievements().stream()
+                .map(a -> EntityModel.of(a,
+                        linkTo(methodOn(AchievementResource.class).getAchievementById(a.getId())).withSelfRel(),
+                        linkTo(methodOn(AchievementResource.class).updateAchievement(a.getId(), null)).withRel("update"),
+                        linkTo(methodOn(AchievementResource.class).deleteAchievement(a.getId())).withRel("delete")))
+                .toList();
+
+        //return player.getAchievements();
+        return CollectionModel.of(ach, linkTo(methodOn(PlayerResource.class).getMyAchievements(userDetails)).withSelfRel());
     }
 
     /**
@@ -114,7 +131,7 @@ public class PlayerResource
      * @return свой список предметов.
      */
     @GetMapping("/me/items")
-    public List<Item> getMyItems(@AuthenticationPrincipal UserDetails userDetails)
+    public CollectionModel<EntityModel<Item>> getMyItems(@AuthenticationPrincipal UserDetails userDetails)
     {
         String username = userDetails.getUsername();
 
@@ -126,10 +143,19 @@ public class PlayerResource
             throw new NotFoundException("No Player entity attached to user " + username, 0L);
         }
 
-        return player.getItems();
+        List<EntityModel<Item>> items = player.getItems().stream()
+                .map(item -> EntityModel.of(item,
+                        linkTo(methodOn(ItemResource.class).getItemById(item.getId())).withSelfRel(),
+                        linkTo(methodOn(ItemResource.class).updateItem(item.getId(), null)).withRel("update"),
+                        linkTo(methodOn(ItemResource.class).deleteItem(item.getId())).withRel("delete")))
+                .toList();
+
+        //return player.getItems();
+        return CollectionModel.of(items, linkTo(methodOn(PlayerResource.class).getMyItems(userDetails)).withSelfRel());
     }
 
     /**
+     * Метод был реализован, но не получилось грамотно его встроить в тесты из-за нагромождения говно-кода!
      * Метод для регистрации нового игрока.
      * @param request запрос ввода.
      * @return созданного игрока.
@@ -189,11 +215,12 @@ public class PlayerResource
         PlayerDto dto = PlayerMapper.toDto(savedPlayer);
 
         return EntityModel.of(dto,
+                linkTo(methodOn(PlayerResource.class).getMe(userDetails)).withSelfRel(),
                 linkTo(methodOn(PlayerResource.class).getMyGames(userDetails)).withRel("my-games"),
                 linkTo(methodOn(PlayerResource.class).getMyAchievements(userDetails)).withRel("my-achievements"),
                 linkTo(methodOn(PlayerResource.class).getMyItems(userDetails)).withRel("my-items"),
-                linkTo(methodOn(PlayerResource.class).updateMe(null, null)).withRel("update-me")
-        );
+                linkTo(methodOn(PlayerResource.class).updateMe(null, null)).withRel("update-me"),
+                linkTo(methodOn(PlayerResource.class).deleteMe(userDetails)).withRel("delete-me"));
     }
 
     /**

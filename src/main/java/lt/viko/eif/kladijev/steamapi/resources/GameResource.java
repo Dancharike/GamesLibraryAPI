@@ -92,13 +92,20 @@ public class GameResource
      */
     @GetMapping("/{id}/achievements")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<AchievementDto> getGameAchievementsByID(@PathVariable Long id)
+    public CollectionModel<EntityModel<AchievementDto>> getGameAchievementsByID(@PathVariable Long id)
     {
-        Game game = gameRepository.findById(id).orElseThrow(() -> new RuntimeException("Game not found"));
+        Game game = gameRepository.findById(id).orElseThrow(() -> new NotFoundException("Game", id));
 
-        return game.getAchievements().stream()
-                .map(AchievementMapper::toDto)
-                .toList();
+        List<EntityModel<AchievementDto>> achievements = game.getAchievements().stream()
+                .map(a -> {
+                    AchievementDto dto = AchievementMapper.toDto(a);
+                    return EntityModel.of(dto,
+                            linkTo(methodOn(AchievementResource.class).getAchievementById(a.getId())).withSelfRel(),
+                            linkTo(methodOn(AchievementResource.class).updateAchievement(a.getId(), null)).withRel("update"),
+                            linkTo(methodOn(AchievementResource.class).deleteAchievement(a.getId())).withRel("delete"));
+                }).toList();
+
+        return CollectionModel.of(achievements, linkTo(methodOn(GameResource.class).getGameAchievementsByID(id)).withSelfRel());
     }
 
     /**
@@ -108,13 +115,20 @@ public class GameResource
      */
     @GetMapping("/{id}/items")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<ItemDto> getGameItemsByID(@PathVariable Long id)
+    public CollectionModel<EntityModel<ItemDto>> getGameItemsByID(@PathVariable Long id)
     {
-        Game game = gameRepository.findById(id).orElseThrow(() -> new RuntimeException("Game not found"));
+        Game game = gameRepository.findById(id).orElseThrow(() -> new NotFoundException("Game", id));
 
-        return game.getItems().stream()
-                .map(ItemMapper::toDto)
-                .toList();
+        List<EntityModel<ItemDto>> items = game.getItems().stream()
+                .map(item -> {
+                    ItemDto dto = ItemMapper.toDto(item);
+                    return EntityModel.of(dto,
+                            linkTo(methodOn(ItemResource.class).getItemById(item.getId())).withSelfRel(),
+                            linkTo(methodOn(ItemResource.class).updateItem(item.getId(), null)).withRel("update"),
+                            linkTo(methodOn(ItemResource.class).deleteItem(item.getId())).withRel("delete"));
+                }).toList();
+
+        return CollectionModel.of(items, linkTo(methodOn(GameResource.class).getGameItemsByID(id)).withSelfRel());
     }
 
     /**
@@ -161,7 +175,13 @@ public class GameResource
         Game saved = gameRepository.save(game);
         GameDto dto = GameMapper.toDto(saved);
 
-        return EntityModel.of(dto, linkTo(methodOn(GameResource.class).getGameById(saved.getId())).withSelfRel());
+        return EntityModel.of(dto,
+                linkTo(methodOn(GameResource.class).getGameById(saved.getId())).withSelfRel(),
+                linkTo(methodOn(GameResource.class).updateGame(saved.getId(), null)).withRel("update"),
+                linkTo(methodOn(GameResource.class).deleteGame(saved.getId())).withRel("delete"),
+                linkTo(methodOn(GameResource.class).getGameAchievementsByID(saved.getId())).withRel("achievements"),
+                linkTo(methodOn(GameResource.class).getGameItemsByID(saved.getId())).withRel("items"),
+                linkTo(methodOn(GameResource.class).getAllGames()).withRel("all-games"));
     }
 
     /**
@@ -183,7 +203,12 @@ public class GameResource
         Game saved = gameRepository.save(existing);
         GameDto dto = GameMapper.toDto(saved);
 
-        return EntityModel.of(dto, linkTo(methodOn(GameResource.class).getGameById(saved.getId())).withSelfRel());
+        return EntityModel.of(dto,
+                linkTo(methodOn(GameResource.class).getGameById(saved.getId())).withSelfRel(),
+                linkTo(methodOn(GameResource.class).deleteGame(saved.getId())).withRel("delete"),
+                linkTo(methodOn(GameResource.class).getGameAchievementsByID(saved.getId())).withRel("achievements"),
+                linkTo(methodOn(GameResource.class).getGameItemsByID(saved.getId())).withRel("items"),
+                linkTo(methodOn(GameResource.class).getAllGames()).withRel("all-games"));
     }
 
     /**
@@ -196,6 +221,12 @@ public class GameResource
     public ResponseEntity<?> deleteGame(@PathVariable Long id)
     {
         gameRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+
+        var model = EntityModel.of("Game deleted successfully!");
+        model.add(linkTo(methodOn(GameResource.class).getAllGames()).withRel("all-games"));
+        model.add(linkTo(methodOn(GameResource.class).createGame(null)).withRel("create"));
+
+        //return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(model);
     }
 }

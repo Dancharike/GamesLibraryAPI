@@ -155,6 +155,7 @@ public class AdminResource
         List<EntityModel<Game>> games = player.getGames().stream()
                 .map(game -> EntityModel.of(game,
                         linkTo(methodOn(GameResource.class).getGameById(game.getId())).withSelfRel(),
+                        linkTo(methodOn(GameResource.class).updateGame(game.getId(), null)).withRel("update"),
                         linkTo(methodOn(GameResource.class).deleteGame(game.getId())).withRel("delete")))
                 .toList();
 
@@ -174,6 +175,7 @@ public class AdminResource
         List<EntityModel<Achievement>> achievements = player.getAchievements().stream()
                 .map(a -> EntityModel.of(a,
                         linkTo(methodOn(AchievementResource.class).getAchievementById(a.getId())).withSelfRel(),
+                        linkTo(methodOn(AchievementResource.class).updateAchievement(a.getId(), null)).withRel("update"),
                         linkTo(methodOn(AchievementResource.class).deleteAchievement(a.getId())).withRel("delete")))
                 .toList();
 
@@ -193,6 +195,7 @@ public class AdminResource
         List<EntityModel<Item>> items = player.getItems().stream()
                 .map(item -> EntityModel.of(item,
                         linkTo(methodOn(ItemResource.class).getItemById(item.getId())).withSelfRel(),
+                        linkTo(methodOn(ItemResource.class).updateItem(item.getId(), null)).withRel("update"),
                         linkTo(methodOn(ItemResource.class).deleteItem(item.getId())).withRel("delete")))
                 .toList();
 
@@ -220,7 +223,9 @@ public class AdminResource
 
         return EntityModel.of(dto,
                 linkTo(methodOn(AdminResource.class).getPlayerById(savedPlayer.getId())).withSelfRel(),
-                linkTo(methodOn(AdminResource.class).getAllPlayers()).withRel("all-players"));
+                linkTo(methodOn(AdminResource.class).getAllPlayers()).withRel("all-players"),
+                linkTo(methodOn(AdminResource.class).updatePlayer(savedPlayer.getId(), null)).withRel("update"),
+                linkTo(methodOn(AdminResource.class).deletePlayer(savedPlayer.getId())).withRel("delete"));
     }
 
     /**
@@ -244,7 +249,9 @@ public class AdminResource
 
         return EntityModel.of(dto,
                 linkTo(methodOn(AdminResource.class).getAdminById(savedAdmin.getId())).withSelfRel(),
-                linkTo(methodOn(AdminResource.class).getAllAdmins()).withRel("all-admins"));
+                linkTo(methodOn(AdminResource.class).getAllAdmins()).withRel("all-admins"),
+                linkTo(methodOn(AdminResource.class).updateAdmin(savedAdmin.getId(), null)).withRel("update"),
+                linkTo(methodOn(AdminResource.class).deleteAdmin(savedAdmin.getId())).withRel("delete"));
     }
 
     /**
@@ -279,7 +286,10 @@ public class AdminResource
         Player saved = playerRepository.save(player);
         PlayerDto dto = PlayerMapper.toDto(saved);
 
-        return EntityModel.of(dto, linkTo(methodOn(AdminResource.class).getPlayerById(saved.getId())).withSelfRel());
+        return EntityModel.of(dto,
+                linkTo(methodOn(AdminResource.class).getPlayerById(saved.getId())).withSelfRel(),
+                linkTo(methodOn(AdminResource.class).getAllPlayers()).withRel("all-players"),
+                linkTo(methodOn(AdminResource.class).deletePlayer(saved.getId())).withRel("delete"));
     }
 
     /**
@@ -314,7 +324,10 @@ public class AdminResource
         Admin saved = adminRepository.save(admin);
         AdminDto dto = AdminMapper.toDto(saved);
 
-        return EntityModel.of(dto, linkTo(methodOn(AdminResource.class).getAdminById(saved.getId())).withSelfRel());
+        return EntityModel.of(dto,
+                linkTo(methodOn(AdminResource.class).getAdminById(saved.getId())).withSelfRel(),
+                linkTo(methodOn(AdminResource.class).getAllAdmins()).withRel("all-admins"),
+                linkTo(methodOn(AdminResource.class).deleteAdmin(saved.getId())).withRel("delete"));
     }
 
     /**
@@ -334,7 +347,13 @@ public class AdminResource
         });
 
         playerRepository.delete(player);
-        return ResponseEntity.noContent().build();
+
+        EntityModel<String> model = EntityModel.of("Player deleted successfully!");
+        model.add(linkTo(methodOn(AdminResource.class).getAllPlayers()).withRel("all-players"));
+        model.add(linkTo(methodOn(AdminResource.class).createPlayer(null)).withRel("create-player"));
+
+        return ResponseEntity.ok(model);
+        //return ResponseEntity.noContent().build();
     }
 
     /**
@@ -354,6 +373,12 @@ public class AdminResource
         });
 
         adminRepository.delete(admin);
-        return ResponseEntity.noContent().build();
+
+        EntityModel<String> model = EntityModel.of("Admin deleted successfully!");
+        model.add(linkTo(methodOn(AdminResource.class).getAllAdmins()).withRel("all-admins"));
+        model.add(linkTo(methodOn(AdminResource.class).createAdmin(null)).withRel("create-admin"));
+
+        return ResponseEntity.ok(model);
+        //return ResponseEntity.noContent().build();
     }
 }
